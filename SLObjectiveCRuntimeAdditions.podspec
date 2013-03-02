@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "SLObjectiveCRuntimeAdditions"
-  s.version      = "0.0.1"
+  s.version      = "0.0.2"
   s.summary      = "Objc runtime additions."
   s.homepage     = "https://github.com/OliverLetterer/SLObjectiveCRuntimeAdditions"
 
