@@ -1,12 +1,14 @@
 //
-//  CTBlockDescription.h
-//  CTBlockDescription
+//  SLBlockDescription.h
+//  SLBlockDescription
 //
 //  Created by Oliver Letterer on 01.09.12.
 //  Copyright (c) 2012 olettere. All rights reserved.
 //
 
-struct CTBlockLiteral {
+#import <Foundation/Foundation.h>
+
+struct SLBlockLiteral {
     void *isa; // initialized to &_NSConcreteStackBlock or &_NSConcreteGlobalBlock
     int flags;
     int reserved;
@@ -24,19 +26,19 @@ struct CTBlockLiteral {
 };
 
 enum {
-    CTBlockDescriptionFlagsHasCopyDispose = (1 << 25),
-    CTBlockDescriptionFlagsHasCtor = (1 << 26), // helpers have C++ code
-    CTBlockDescriptionFlagsIsGlobal = (1 << 28),
-    CTBlockDescriptionFlagsHasStret = (1 << 29), // IFF BLOCK_HAS_SIGNATURE
-    CTBlockDescriptionFlagsHasSignature = (1 << 30)
+    SLBlockDescriptionFlagsHasCopyDispose = (1 << 25),
+    SLBlockDescriptionFlagsHasCtor = (1 << 26), // helpers have C++ code
+    SLBlockDescriptionFlagsIsGlobal = (1 << 28),
+    SLBlockDescriptionFlagsHasStret = (1 << 29), // IFF BLOCK_HAS_SIGNATURE
+    SLBlockDescriptionFlagsHasSignature = (1 << 30)
 };
-typedef int CTBlockDescriptionFlags;
+typedef int SLBlockDescriptionFlags;
 
 
 
-@interface CTBlockDescription : NSObject
+@interface SLBlockDescription : NSObject
 
-@property (nonatomic, readonly) CTBlockDescriptionFlags flags;
+@property (nonatomic, readonly) SLBlockDescriptionFlags flags;
 @property (nonatomic, readonly) NSMethodSignature *blockSignature;
 @property (nonatomic, readonly) unsigned long int size;
 @property (nonatomic, readonly) id block;

@@ -1,18 +1,18 @@
 //
-//  CTObjectiveCRuntimeAdditionsTests.m
-//  CTObjectiveCRuntimeAdditionsTests
+//  SLObjectiveCRuntimeAdditionsTests.m
+//  SLObjectiveCRuntimeAdditionsTests
 //
 //  Created by Oliver Letterer on 28.04.12.
 //  Copyright (c) 2012 Home. All rights reserved.
 //
 
-#import "CTObjectiveCRuntimeAdditionsTests.h"
-#import "CTObjectiveCRuntimeAdditions.h"
-#import "CTTestSwizzleClass.h"
-#import "CTTestSwizzleSubclass.h"
-#import "CTBlockDescription.h"
+#import "SLObjectiveCRuntimeAdditionsTests.h"
+#import "SLObjectiveCRuntimeAdditions.h"
+#import "SLTestSwizzleClass.h"
+#import "SLTestSwizzleSubclass.h"
+#import "SLBlockDescription.h"
 
-@implementation CTObjectiveCRuntimeAdditionsTests
+@implementation SLObjectiveCRuntimeAdditionsTests
 
 - (void)setUp
 {
@@ -34,7 +34,7 @@
         return YES;
     };
     
-    CTBlockDescription *blockDescription = [[CTBlockDescription alloc] initWithBlock:testBlock];
+    SLBlockDescription *blockDescription = [[SLBlockDescription alloc] initWithBlock:testBlock];
     NSMethodSignature *methodSignature = blockDescription.blockSignature;
     
     STAssertEquals(strcmp(methodSignature.methodReturnType, @encode(BOOL)), 0, @"return type wrong");
@@ -47,20 +47,20 @@
 
 - (void)testBlockSwizzling
 {
-    Class class = [CTTestSwizzleClass class];
-    CTTestSwizzleClass *testObject = [[CTTestSwizzleClass alloc] init];
+    Class class = [SLTestSwizzleClass class];
+    SLTestSwizzleClass *testObject = [[SLTestSwizzleClass alloc] init];
     NSString *originalString = [testObject helloWorldStringFromString:@"Oli"];
     
     STAssertEqualObjects(originalString, @"Hello World Oli", @"Original helloWorldString wrong");
     
-    __block IMP implementation1 = class_replaceMethodWithBlock(class, @selector(helloWorldStringFromString:), ^NSString *(CTTestSwizzleClass *blockSelf, NSString *string) {
+    __block IMP implementation1 = class_replaceMethodWithBlock(class, @selector(helloWorldStringFromString:), ^NSString *(SLTestSwizzleClass *blockSelf, NSString *string) {
         STAssertEqualObjects(blockSelf, testObject, @"blockSelf is wrong");
         return [implementation1(blockSelf, @selector(helloWorldStringFromString:), string) stringByAppendingFormat:@" Hooked"];
     });
     
     STAssertEqualObjects([testObject helloWorldStringFromString:@"Oli"], @"Hello World Oli Hooked", @"did not swizzle with block");
     
-    __block IMP implementation2 = class_replaceMethodWithBlock(class, @selector(helloWorldStringFromString:), ^NSString *(CTTestSwizzleClass *blockSelf, NSString *string) {
+    __block IMP implementation2 = class_replaceMethodWithBlock(class, @selector(helloWorldStringFromString:), ^NSString *(SLTestSwizzleClass *blockSelf, NSString *string) {
         STAssertEqualObjects(blockSelf, testObject, @"blockSelf is wrong");
         return [implementation2(blockSelf, @selector(helloWorldStringFromString:), string) stringByAppendingFormat:@" Hooked2"];
     });
@@ -73,7 +73,7 @@
     
     typedef CGPoint(*pointImplementation)(id self, SEL _cmd, CGPoint point);
     
-    __block pointImplementation implementation3 = (pointImplementation)class_replaceMethodWithBlock(class, @selector(pointByAddingPoint:), ^CGPoint(CTTestSwizzleClass *blockSelf, CGPoint point) {
+    __block pointImplementation implementation3 = (pointImplementation)class_replaceMethodWithBlock(class, @selector(pointByAddingPoint:), ^CGPoint(SLTestSwizzleClass *blockSelf, CGPoint point) {
         STAssertEqualObjects(blockSelf, testObject, @"blockSelf is wrong");
         
         CGPoint originalPoint = implementation3(blockSelf, @selector(pointByAddingPoint:), point);
@@ -85,10 +85,10 @@
 
 - (void)testMethodSwizzling
 {
-    CTTestSwizzleClass *testObject = [[CTTestSwizzleClass alloc] init];
+    SLTestSwizzleClass *testObject = [[SLTestSwizzleClass alloc] init];
     NSString *originalString = testObject.orginalString;
     
-    class_swizzleSelector(CTTestSwizzleClass.class, @selector(orginalString), @selector(__hookedOriginalString));
+    class_swizzleSelector(SLTestSwizzleClass.class, @selector(orginalString), @selector(__hookedOriginalString));
     
     NSString *hookedString = testObject.orginalString;
     
@@ -99,18 +99,18 @@
 
 - (void)testAutomaticMethodSwizzlingWithMethodPrefix
 {
-    CTTestSwizzleClass *testObject = [[CTTestSwizzleClass alloc] init];
+    SLTestSwizzleClass *testObject = [[SLTestSwizzleClass alloc] init];
     
     NSString *originalString = testObject.stringTwo;
-    NSString *originalStringThree = [CTTestSwizzleClass stringThree];
+    NSString *originalStringThree = [SLTestSwizzleClass stringThree];
     NSString *originalJoinedString = [testObject stringByJoiningString:@"my" withWith:@"string"];
     
     NSString *originalStringFive = testObject.__prefixedHookedStringFive;
     
-    class_swizzlesMethodsWithPrefix(CTTestSwizzleClass.class, @"__prefixedHooked");
+    class_swizzlesMethodsWithPrefix(SLTestSwizzleClass.class, @"__prefixedHooked");
     
     NSString *hookedString = testObject.stringTwo;
-    NSString *hookedStringThree = [CTTestSwizzleClass stringThree];
+    NSString *hookedStringThree = [SLTestSwizzleClass stringThree];
     NSString *hookedJoinedString = [testObject stringByJoiningString:@"my" withWith:@"string"];
     
     STAssertFalse([originalString isEqualToString:hookedString], @"originalString cannot be equal to hookedString.");
@@ -130,11 +130,11 @@
 
 - (void)testDynamicSubclassFinding
 {
-    Class subclass = class_subclassPassingTest(CTTestSwizzleClass.class, ^BOOL(__unsafe_unretained Class subclass) {
+    Class subclass = class_subclassPassingTest(SLTestSwizzleClass.class, ^BOOL(__unsafe_unretained Class subclass) {
         return [subclass passesTest];
     });
     
-    STAssertEqualObjects(subclass, CTTestSwizzleSubclass.class, @"subclass that passes test should be CTTestSwizzleSubclass");
+    STAssertEqualObjects(subclass, SLTestSwizzleSubclass.class, @"subclass that passes test should be SLTestSwizzleSubclass");
 }
 
 @end

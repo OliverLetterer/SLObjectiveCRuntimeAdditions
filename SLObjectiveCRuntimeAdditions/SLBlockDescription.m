@@ -1,30 +1,31 @@
 //
-//  CTBlockDescription.m
-//  CTBlockDescription
+//  SLBlockDescription.m
+//  SLBlockDescription
 //
 //  Created by Oliver Letterer on 01.09.12.
 //  Copyright (c) 2012 olettere. All rights reserved.
 //
 
-#import "CTBlockDescription.h"
+#import "SLBlockDescription.h"
+#import <Foundation/Foundation.h>
 
-@implementation CTBlockDescription
+@implementation SLBlockDescription
 
 - (id)initWithBlock:(id)block
 {
     if (self = [super init]) {
         _block = block;
         
-        struct CTBlockLiteral *blockRef = (__bridge struct CTBlockLiteral *)block;
+        struct SLBlockLiteral *blockRef = (__bridge struct SLBlockLiteral *)block;
         _flags = blockRef->flags;
         _size = blockRef->descriptor->size;
         
-        if (_flags & CTBlockDescriptionFlagsHasSignature) {
+        if (_flags & SLBlockDescriptionFlagsHasSignature) {
             void *signatureLocation = blockRef->descriptor;
             signatureLocation += sizeof(unsigned long int);
             signatureLocation += sizeof(unsigned long int);
             
-            if (_flags & CTBlockDescriptionFlagsHasCopyDispose) {
+            if (_flags & SLBlockDescriptionFlagsHasCopyDispose) {
                 signatureLocation += sizeof(void(*)(void *dst, void *src));
                 signatureLocation += sizeof(void (*)(void *src));
             }

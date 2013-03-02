@@ -1,18 +1,18 @@
 //
-//  CTTestSwizzleSubclass.h
-//  CTObjectiveCRuntimeAdditions
+//  SLTestSwizzleSubclass.h
+//  SLObjectiveCRuntimeAdditions
 //
 //  Created by Oliver Letterer on 28.04.12.
 //  Copyright 2012 ebf. All rights reserved.
 //
 
-#import "CTTestSwizzleClass.h"
+#import "SLTestSwizzleClass.h"
 
 
 /**
  @abstract  <#abstract comment#>
  */
-@interface CTTestSwizzleSubclass : CTTestSwizzleClass {
+@interface SLTestSwizzleSubclass : SLTestSwizzleClass {
 @private
     
 }

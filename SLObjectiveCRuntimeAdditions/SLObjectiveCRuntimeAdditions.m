@@ -1,13 +1,13 @@
 //
-//  CTObjectiveCRuntimeAdditions.m
-//  CTObjectiveCRuntimeAdditions
+//  SLObjectiveCRuntimeAdditions.m
+//  SLObjectiveCRuntimeAdditions
 //
 //  Created by Oliver Letterer on 28.04.12.
 //  Copyright (c) 2012 ebf. All rights reserved.
 //
 
-#import "CTObjectiveCRuntimeAdditions.h"
-#import "CTBlockDescription.h"
+#import "SLObjectiveCRuntimeAdditions.h"
+#import "SLBlockDescription.h"
 
 void class_swizzleSelector(Class class, SEL originalSelector, SEL newSelector)
 {
@@ -22,7 +22,7 @@ void class_swizzleSelector(Class class, SEL originalSelector, SEL newSelector)
 
 void class_swizzlesMethodsWithPrefix(Class class, NSString *prefix)
 {
-    CTMethodEnumertor enumeratorBlock = ^(Class class, Method method) {
+    SLMethodEnumertor enumeratorBlock = ^(Class class, Method method) {
         SEL methodSelector = method_getName(method);
         NSString *selectorString = NSStringFromSelector(methodSelector);
         
@@ -50,7 +50,7 @@ void class_swizzlesMethodsWithPrefix(Class class, NSString *prefix)
     class_enumerateMethodList(metaClass, enumeratorBlock);
 }
 
-void class_enumerateMethodList(Class class, CTMethodEnumertor enumerator)
+void class_enumerateMethodList(Class class, SLMethodEnumertor enumerator)
 {
     if (!enumerator) return;
     
@@ -72,7 +72,7 @@ void class_enumerateMethodList(Class class, CTMethodEnumertor enumerator)
     free(methods);
 }
 
-Class class_subclassPassingTest(Class class, CTClassTest test)
+Class class_subclassPassingTest(Class class, SLClassTest test)
 {
     if (!test) return nil;
     

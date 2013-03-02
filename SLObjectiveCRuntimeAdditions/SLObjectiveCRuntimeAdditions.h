@@ -1,13 +1,15 @@
 //
-//  CTObjectiveCRuntimeAdditions.h
-//  CTObjectiveCRuntimeAdditions
+//  SLObjectiveCRuntimeAdditions.h
+//  SLObjectiveCRuntimeAdditions
 //
 //  Created by Oliver Letterer on 28.04.12.
 //  Copyright (c) 2012 ebf. All rights reserved.
 //
 
-typedef void(^CTMethodEnumertor)(Class class, Method method);
-typedef BOOL(^CTClassTest)(Class subclass);
+#import <objc/runtime.h>
+
+typedef void(^SLMethodEnumertor)(Class class, Method method);
+typedef BOOL(^SLClassTest)(Class subclass);
 
 /**
  @abstract Swizzles originalSelector with newSelector.
@@ -22,12 +24,12 @@ void class_swizzlesMethodsWithPrefix(Class class, NSString *prefix);
 /**
  @abstract Enumerate class methods.
  */
-void class_enumerateMethodList(Class class, CTMethodEnumertor enumerator);
+void class_enumerateMethodList(Class class, SLMethodEnumertor enumerator);
 
 /**
  @return A subclass of class which passes test.
  */
-Class class_subclassPassingTest(Class class, CTClassTest test);
+Class class_subclassPassingTest(Class class, SLClassTest test);
 
 /**
  @abstract Replaces implementation of method of originalSelector with block.
