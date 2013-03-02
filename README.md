@@ -1,12 +1,12 @@
-CTObjectiveCRuntimeAdditions
+SLObjectiveCRuntimeAdditions
 ============================
 
-CTObjectiveCRuntimeAdditions introduces the following new runtime additions:
+SLObjectiveCRuntimeAdditions introduces the following new runtime additions:
 
 * `void class_swizzleSelector(Class class, SEL originalSelector, SEL newSelector);`
 * `void class_swizzlesMethodsWithPrefix(Class class, NSString *prefix);`
-* `void class_enumerateMethodList(Class class, CTMethodEnumertor enumerator);`
-* `Class class_subclassPassingTest(Class class, CTClassTest test);`
+* `void class_enumerateMethodList(Class class, SLMethodEnumertor enumerator);`
+* `Class class_subclassPassingTest(Class class, SLClassTest test);`
 * `IMP class_replaceMethodWithBlock(Class class, SEL originalSelector, id block);`
 * `void class_implementPropertyInUserDefaults(Class class, NSString *propertyName, BOOL automaticSynchronizeUserDefaults);`
 * `void class_implementProperty(Class class, NSString *propertyName, objc_AssociationPolicy associationPolicy);`
@@ -14,9 +14,9 @@ CTObjectiveCRuntimeAdditions introduces the following new runtime additions:
 
 Getting runtime information about blocks
 ============================
-[CTBlockDescription](https://github.com/ebf/CTObjectiveCRuntimeAdditions/blob/master/CTObjectiveCRuntimeAdditions/CTObjectiveCRuntimeAdditions/CTBlockDescription.h) lets you inspect blocks including arguments and compile time features at runtime.
+[SLBlockDescription](https://github.com/ebf/SLObjectiveCRuntimeAdditions/blob/master/SLObjectiveCRuntimeAdditions/SLObjectiveCRuntimeAdditions/SLBlockDescription.h) lets you inspect blocks including arguments and compile time features at runtime.
 
-One could use CTBlockDescription for the following test block:
+One could use SLBlockDescription for the following test block:
 
 ``` objc
 // a test block.
@@ -25,7 +25,7 @@ BOOL(^testBlock)(BOOL animated, id object) = ^BOOL(BOOL animated, id object) {
 };
 
 // allocating a block description
-CTBlockDescription *blockDescription = [[CTBlockDescription alloc] initWithBlock:testBlock];
+SLBlockDescription *blockDescription = [[SLBlockDescription alloc] initWithBlock:testBlock];
 
 // getting a method signature for this block
 NSMethodSignature *methodSignature = blockDescription.blockSignature;
