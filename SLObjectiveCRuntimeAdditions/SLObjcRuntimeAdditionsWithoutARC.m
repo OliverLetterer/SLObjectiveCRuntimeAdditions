@@ -6,7 +6,7 @@
 //  Copyright 2013 SparrowLabs. All rights reserved.
 //
 
-#import "SLObjcRuntimeAdditionsHiddenClass.h"
+#import "SLObjcRuntimeAdditionsWithoutARC.h"
 
 #if __has_feature(objc_arc)
 #error SLObjcRuntimeAdditionsHiddenClass does not support Objective-C Automatic Reference Counting (ARC)
