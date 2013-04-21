@@ -47,3 +47,21 @@ void class_implementPropertyInUserDefaults(Class class, NSString *propertyName, 
  */
 void class_implementProperty(Class class, NSString *propertyName);
 
+/**
+ Adds a new method to `object` for `selector` to a new subclass introduced at runtime.
+ 
+ Sample if object response to `- (NSString *)sayHello;`:
+
+object_interposeBlockImplementation(object, @selector(sayHello), ^NSString *(id _self) {
+    struct objc_super super = {
+        _self,
+        [_self class]
+    };
+    
+    NSString *original = objc_msgSendSuper(&super, @selector(sayHello));
+    return [original stringByAppendingString:@" Wuff"];
+});
+ 
+ @warning: This does not work with some base Foundation classes like __NSCFString.
+  */
+void object_interposeBlockImplementation(id object, SEL selector, id block);

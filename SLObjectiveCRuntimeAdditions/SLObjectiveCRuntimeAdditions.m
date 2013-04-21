@@ -8,6 +8,7 @@
 
 #import "SLObjectiveCRuntimeAdditions.h"
 #import "SLBlockDescription.h"
+#import "SLObjcRuntimeAdditionsWithoutARC.h"
 
 void class_swizzleSelector(Class class, SEL originalSelector, SEL newSelector)
 {
@@ -276,4 +277,14 @@ return;\
 #undef CASE
     
     NSCAssert(NO, @"encoding %@ in not supported", encoding);
+}
+
+void object_interposeBlockImplementation(id object, SEL selector, id block)
+{
+    Class originalClass = object_getClass(object);
+    Class newClass = object_interposeHiddenClass(object);
+    
+    Method originalMethod = class_getInstanceMethod(originalClass, selector);
+    BOOL success = class_addMethod(newClass, selector, imp_implementationWithBlock(block), method_getTypeEncoding(originalMethod));
+    NSCAssert(success, @"");
 }
