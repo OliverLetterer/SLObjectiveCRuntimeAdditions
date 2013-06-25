@@ -203,6 +203,8 @@ void class_implementProperty(Class class, NSString *propertyName)
         }
     }
     
+    free(attributes);
+    
     if (!getterName) {
         getterName = propertyName;
     }
