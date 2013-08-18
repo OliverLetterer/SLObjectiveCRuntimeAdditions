@@ -376,5 +376,7 @@ void __attribute__((overloadable)) object_ensureDynamicSubclass(id object, NSStr
         objc_registerClassPair(newDynamicSubclass);
     }
     
+    object_setClass(object, newDynamicSubclass);
+    
     OSSpinLockUnlock(&lock);
 }
