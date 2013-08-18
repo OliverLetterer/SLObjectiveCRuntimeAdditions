@@ -8,7 +8,6 @@
 
 #import "SLObjectiveCRuntimeAdditions.h"
 #import "SLBlockDescription.h"
-#import "SLObjcRuntimeAdditionsWithoutARC.h"
 #import <libkern/OSAtomic.h>
 
 @interface SLObjectRuntimeDynamicSubclassConstructor : NSObject <SLDynamicSubclassConstructor>
