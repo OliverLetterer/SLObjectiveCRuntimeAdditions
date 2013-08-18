@@ -45,6 +45,6 @@ typedef int SLBlockDescriptionFlags;
 
 - (id)initWithBlock:(id)block;
 
-- (BOOL)isCompatibleForBlockSwizzlingWithMethodSignature:(NSMethodSignature *)methodSignature;
+- (BOOL)blockSignatureIsCompatibleWithMethodSignature:(NSMethodSignature *)methodSignature;
 
 @end
