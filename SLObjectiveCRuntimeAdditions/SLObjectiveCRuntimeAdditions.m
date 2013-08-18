@@ -9,6 +9,57 @@
 #import "SLObjectiveCRuntimeAdditions.h"
 #import "SLBlockDescription.h"
 #import "SLObjcRuntimeAdditionsWithoutARC.h"
+#import <libkern/OSAtomic.h>
+
+@interface SLObjectRuntimeDynamicSubclassConstructor : NSObject <SLDynamicSubclassConstructor>
+
+@property (nonatomic, strong) id object;
+@property (nonatomic, strong) Class class;
+- (id)initWithObject:(id)object class:(Class)class;
+
+@end
+
+@implementation SLObjectRuntimeDynamicSubclassConstructor
+
+- (id)initWithObject:(id)object class:(Class)class
+{
+    if (self = [super init]) {
+        _object = object;
+        _class = class;
+    }
+    
+    return self;
+}
+
+- (BOOL)implementInstanceMethodNamed:(SEL)selector implementation:(id)blockImplementation
+{
+    NSParameterAssert(selector);
+    NSParameterAssert(blockImplementation);
+    
+    NSAssert([[self.object class] instancesRespondToSelector:selector], @"Object does not respond to selector: %@", NSStringFromSelector(selector));
+    Method method = class_getInstanceMethod(object_getClass(self.object), selector);
+    
+    return [self implementInstanceMethodNamed:selector types:method_getTypeEncoding(method) implementation:blockImplementation];
+}
+
+- (BOOL)implementInstanceMethodNamed:(SEL)selector types:(const char *)types implementation:(id)blockImplementation
+{
+    NSParameterAssert(selector);
+    NSParameterAssert(blockImplementation);
+    NSParameterAssert(types);
+    
+    SLBlockDescription *blockDescription = [[SLBlockDescription alloc] initWithBlock:blockImplementation];
+    NSMethodSignature *methodSignature = [NSMethodSignature signatureWithObjCTypes:types];
+    
+    NSAssert([blockDescription blockSignatureIsCompatibleWithMethodSignature:methodSignature], @"block for %@ is not compatible", NSStringFromSelector(selector));
+    
+    IMP implementation = imp_implementationWithBlock(blockImplementation);
+    return class_addMethod(self.class, selector, implementation, types);
+}
+
+@end
+
+
 
 void class_swizzleSelector(Class class, SEL originalSelector, SEL newSelector)
 {
@@ -281,12 +332,49 @@ return;\
     NSCAssert(NO, @"encoding %@ in not supported", encoding);
 }
 
-void object_interposeBlockImplementation(id object, SEL selector, id block)
+void __attribute__((overloadable)) object_ensureDynamicSubclass(id object, NSString *classSuffix, void(^constructor)(id<SLDynamicSubclassConstructor> constructor))
 {
-    Class originalClass = object_getClass(object);
-    Class newClass = object_interposeHiddenClass(object);
+    object_ensureDynamicSubclass(object, classSuffix, YES, constructor);
+}
+
+void __attribute__((overloadable)) object_ensureDynamicSubclass(id object, NSString *classSuffix, BOOL hideDynamicSubclass, void(^constructor)(id<SLDynamicSubclassConstructor> constructor))
+{
+    NSCParameterAssert(object);
+    NSCAssert(classSuffix.length > 0, @"Invalid class suffix");
+    NSCParameterAssert(constructor);
     
-    Method originalMethod = class_getInstanceMethod(originalClass, selector);
-    BOOL success = class_addMethod(newClass, selector, imp_implementationWithBlock(block), method_getTypeEncoding(originalMethod));
-    NSCAssert(success, @"");
+    static OSSpinLock lock = OS_SPINLOCK_INIT;
+    OSSpinLockLock(&lock);
+    
+    Class currentClass = object_getClass(object);
+    SEL alreadySubclassedSelector = NSSelectorFromString([NSString stringWithFormat:@"__SLObjcRuntimeAdditions_%@", classSuffix]);
+    
+    BOOL alreadySubclassed = class_respondsToSelector(currentClass, alreadySubclassedSelector);
+    if (alreadySubclassed) {
+        OSSpinLockUnlock(&lock);
+        return;
+    }
+    
+    NSString *newDynamicSubclassName = [NSString stringWithFormat:@"%@_%@", currentClass, classSuffix];
+    Class newDynamicSubclass = NSClassFromString(newDynamicSubclassName);
+    
+    if (!newDynamicSubclass) {
+        newDynamicSubclass = objc_allocateClassPair(currentClass, newDynamicSubclassName.UTF8String, 0);
+        
+        SLObjectRuntimeDynamicSubclassConstructor *constructorObject = [[SLObjectRuntimeDynamicSubclassConstructor alloc] initWithObject:object class:newDynamicSubclass];
+        
+        [constructorObject implementInstanceMethodNamed:alreadySubclassedSelector types:"v@:" implementation:^(id self) { }];
+        
+        if (hideDynamicSubclass) {
+            [constructorObject implementInstanceMethodNamed:@selector(class) implementation:^Class(id self) {
+                return class_getSuperclass(object_getClass(self));
+            }];
+        }
+        
+        constructor(constructorObject);
+        
+        objc_registerClassPair(newDynamicSubclass);
+    }
+    
+    OSSpinLockUnlock(&lock);
 }

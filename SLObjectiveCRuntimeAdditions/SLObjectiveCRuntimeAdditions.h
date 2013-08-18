@@ -11,6 +11,16 @@
 typedef void(^SLMethodEnumertor)(Class class, Method method);
 typedef BOOL(^SLClassTest)(Class subclass);
 
+
+
+@protocol SLDynamicSubclassConstructor <NSObject>
+- (BOOL)implementInstanceMethodNamed:(SEL)selector implementation:(id)blockImplementation;
+- (BOOL)implementInstanceMethodNamed:(SEL)selector types:(const char *)types implementation:(id)blockImplementation;
+
+@end
+
+
+
 /**
  @abstract Swizzles originalSelector with newSelector.
  */
@@ -33,7 +43,7 @@ Class class_subclassPassingTest(Class class, SLClassTest test);
 
 /**
  @abstract Replaces implementation of method of originalSelector with block.
-           if originalSelector's argument list is (id self, SEL _cmd, ...), then block's argument list must be (id self, ...)
+ if originalSelector's argument list is (id self, SEL _cmd, ...), then block's argument list must be (id self, ...)
  */
 IMP class_replaceMethodWithBlock(Class class, SEL originalSelector, id block);
 
@@ -48,20 +58,7 @@ void class_implementPropertyInUserDefaults(Class class, NSString *propertyName, 
 void class_implementProperty(Class class, NSString *propertyName);
 
 /**
- Adds a new method to `object` for `selector` to a new subclass introduced at runtime.
- 
- Sample if object response to `- (NSString *)sayHello;`:
-
-object_interposeBlockImplementation(object, @selector(sayHello), ^NSString *(id _self) {
-    struct objc_super super = {
-        _self,
-        [_self class]
-    };
-    
-    NSString *original = objc_msgSendSuper(&super, @selector(sayHello));
-    return [original stringByAppendingString:@" Wuff"];
-});
- 
- @warning: This does not work with some base Foundation classes like __NSCFString.
-  */
-void object_interposeBlockImplementation(id object, SEL selector, id block);
+ Ensures that `object` is a new dynamic subclass with suffix `_classSuffix`. `constructor` will be used to implement all dynamic subclass methods.
+ */
+void __attribute__((overloadable)) object_ensureDynamicSubclass(id object, NSString *classSuffix, void(^constructor)(id<SLDynamicSubclassConstructor> constructor));
+void __attribute__((overloadable)) object_ensureDynamicSubclass(id object, NSString *classSuffix, BOOL hideDynamicSubclass, void(^constructor)(id<SLDynamicSubclassConstructor> constructor));
