@@ -9,6 +9,25 @@
 #import "SLBlockDescription.h"
 #import <Foundation/Foundation.h>
 
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_6_0
+NS_INLINE const char * remove_quoted_parts(const char *str){
+    char *result = malloc(strlen(str) + 1);
+    BOOL skip = NO;
+    char *to = result;
+    char c;
+    while ((c = *str++)) {
+        if ('"' == c) {
+            skip = !skip;
+            continue;
+        }
+        if (skip) continue;
+        *to++ = c;
+    }
+    *to = '\0';
+    return result;
+}
+#endif
+
 @implementation SLBlockDescription
 
 - (id)initWithBlock:(id)block
@@ -31,6 +50,12 @@
             }
             
             const char *signature = (*(const char **)signatureLocation);
+            
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_6_0
+            // NSMethodSignature on iOS 5 can not handle quoted class names
+            signature = remove_quoted_parts(signature);
+#endif
+            
             _blockSignature = [NSMethodSignature signatureWithObjCTypes:signature];
         }
     }
