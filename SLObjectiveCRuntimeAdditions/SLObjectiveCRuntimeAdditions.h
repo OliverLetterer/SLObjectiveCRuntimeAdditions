@@ -57,6 +57,8 @@ void class_implementPropertyInUserDefaults(Class class, NSString *propertyName, 
  */
 void class_implementProperty(Class class, NSString *propertyName);
 
+void class_implementDelayedSetter(Class class, NSTimeInterval delay, SEL getter, SEL setter, SEL action);
+
 /**
  Ensures that `object` is a new dynamic subclass with suffix `_classSuffix`. `constructor` will be used to implement all dynamic subclass methods.
  */

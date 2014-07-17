@@ -9,6 +9,7 @@
 #import "SLObjectiveCRuntimeAdditions.h"
 #import "SLBlockDescription.h"
 #import <libkern/OSAtomic.h>
+#import <objc/message.h>
 
 @interface SLObjectRuntimeDynamicSubclassConstructor : NSObject <SLDynamicSubclassConstructor>
 
@@ -378,4 +379,27 @@ void __attribute__((overloadable)) object_ensureDynamicSubclass(id object, NSStr
     object_setClass(object, newDynamicSubclass);
 
     OSSpinLockUnlock(&lock);
+}
+
+void class_implementDelayedSetter(Class class, NSTimeInterval delay, SEL getter, SEL setter, SEL action)
+{
+    NSString *newSelectorName = [NSString stringWithFormat:@"__delayedImplementation_%@", NSStringFromSelector(setter)];
+    SEL swizzledSelector = NSSelectorFromString(newSelectorName);
+
+    IMP swizzledImplementation = imp_implementationWithBlock(^(id self, id value) {
+        ((void(*)(id, SEL, id))objc_msgSend)(self, swizzledSelector, value);
+
+        double delayInSeconds = delay;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            id currentValue = [self valueForKey:NSStringFromSelector(getter)];
+
+            if (currentValue == value) {
+                ((void(*)(id, SEL, id))objc_msgSend)(self, action, currentValue);
+            }
+        });
+    });
+
+    class_addMethod(class, swizzledSelector, swizzledImplementation, "v@:@");
+    class_swizzleSelector(class, setter, swizzledSelector);
 }
