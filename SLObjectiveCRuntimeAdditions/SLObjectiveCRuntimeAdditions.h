@@ -8,12 +8,15 @@
 
 #import <objc/runtime.h>
 
-typedef void(^SLMethodEnumertor)(Class class, Method method);
-typedef BOOL(^SLClassTest)(Class subclass);
+NS_ASSUME_NONNULL_BEGIN
+
+typedef void(^SLMethodEnumertor)(Class __nonnull class, Method __nonnull method);
+typedef BOOL(^SLClassTest)(Class __nonnull subclass);
 
 
 
 @protocol SLDynamicSubclassConstructor <NSObject>
+
 - (BOOL)implementInstanceMethodNamed:(SEL)selector implementation:(id)blockImplementation;
 - (BOOL)implementInstanceMethodNamed:(SEL)selector types:(const char *)types implementation:(id)blockImplementation;
 
@@ -64,3 +67,5 @@ void class_implementDelayedSetter(Class class, NSTimeInterval delay, SEL getter,
  */
 void __attribute__((overloadable)) object_ensureDynamicSubclass(id object, NSString *classSuffix, void(^constructor)(id<SLDynamicSubclassConstructor> constructor));
 void __attribute__((overloadable)) object_ensureDynamicSubclass(id object, NSString *classSuffix, BOOL hideDynamicSubclass, void(^constructor)(id<SLDynamicSubclassConstructor> constructor));
+
+NS_ASSUME_NONNULL_END

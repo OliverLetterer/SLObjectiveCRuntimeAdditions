@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 struct SLBlockLiteral {
     void *isa; // initialized to &_NSConcreteStackBlock or &_NSConcreteGlobalBlock
     int flags;
@@ -48,3 +50,5 @@ typedef int SLBlockDescriptionFlags;
 - (BOOL)blockSignatureIsCompatibleWithMethodSignature:(NSMethodSignature *)methodSignature;
 
 @end
+
+NS_ASSUME_NONNULL_END
